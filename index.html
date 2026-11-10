@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEARCH LAB | Sequential Search</title>
+<style>
+:root{--navy:#17365d;--blue:#2463a6;--pale:#eaf3ff;--ink:#203047;--muted:#65758b;--line:#dce5ef;--green:#16834a;--red:#b83245;--gold:#a66a08}
+*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif}
+header{background:linear-gradient(115deg,#17365d,#2873b8);color:#fff;padding:25px 18px}.wrap{max-width:1040px;margin:auto;padding:0 16px}
+header h1{font-size:30px;letter-spacing:2px;margin:0}header p{margin:4px 0 0;color:#e0edff}
+main{padding:22px 0 40px}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:19px;margin-bottom:15px;box-shadow:0 5px 18px #17365d0a}
+h2{font-size:18px;color:var(--navy);margin:0 0 10px}.small{font-size:13px;color:var(--muted)}
+.group-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.group-btn{padding:12px 6px;border:1px solid var(--line);border-radius:10px;background:#f7faff;color:var(--navy);font-weight:bold;cursor:pointer}
+.group-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:inline-block;background:var(--pale);color:var(--blue);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:bold}
+.target{font-size:25px;font-weight:800;color:var(--blue);margin:5px 0 12px}
+.data-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:15px 0}
+.item{min-height:76px;border:1px solid var(--line);border-radius:10px;background:#fbfdff;padding:10px 5px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.item .number{font-size:11px;color:var(--muted)}.item .value{font-weight:bold;font-size:13px}
+.item.current{border:2px solid var(--gold);background:#fff7e5}.item.checked{background:#f0f4f8}.item.found{border:2px solid var(--green);background:#eaf8ef}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}button.action{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer}
+.primary{background:var(--blue);color:#fff}.secondary{background:#eaf0f7;color:var(--navy)}button:disabled{opacity:.45;cursor:not-allowed}
+.status{padding:12px 14px;border-radius:9px;background:#f1f5f9;min-height:45px;margin:12px 0}.status.good{background:#eaf8ef;color:#12643b}.status.bad{background:#fff0f1;color:#9c2634}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.stat{background:#f5f8fc;border-radius:9px;padding:10px 12px;color:var(--muted);font-size:12px}
+.stat strong{display:block;color:var(--navy);font-size:20px;margin-top:3px}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted);font-weight:bold}
+.steps li{margin:5px 0}footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 0 20px}
+@media(max-width:700px){.data-grid{grid-template-columns:repeat(4,1fr)}.stats{grid-template-columns:1fr}}
+</style></head><body>
+<header><div class="wrap"><h1>SEARCH LAB</h1><p>Simulasi Algoritma Sequential Search · Informatika Kelas X</p></div></header>
+<main class="wrap">
+<section class="panel"><div class="topline"><h2>Pilih kelompok kalian</h2><span class="pill">9 kelompok · 3 kasus per kelompok</span></div>
+<p class="small">Klik nomor kelompok sesuai pembagian dari guru. Urutan target pada Kasus 1 bervariasi antarkelompok. Kasus 2 ditemukan pada elemen terakhir, sedangkan Kasus 3 tidak ditemukan.</p><div class="group-grid" id="groupButtons"></div></section>
+<section class="panel">
+<div class="topline"><div><span class="pill" id="groupName">KELOMPOK 1</span><h2 id="caseName" style="margin-top:8px">Kasus 1 dari 3</h2></div><span class="pill">Mulai dari elemen pertama</span></div>
+<p style="margin-bottom:2px">Temukan ruang kelas berikut dalam daftar:</p><div class="target" id="target"></div><div class="data-grid" id="dataGrid"></div>
+<div class="controls"><button class="action primary" id="checkBtn">Periksa berikutnya</button><button class="action secondary" id="retryBtn">Ulangi kasus</button><button class="action secondary" id="nextBtn" disabled>Kasus berikutnya</button></div>
+<div class="status" id="status" aria-live="polite">Tekan “Periksa berikutnya” untuk memeriksa data pertama.</div>
+<div class="stats"><div class="stat">Jumlah pemeriksaan<strong id="count">0</strong></div><div class="stat">Posisi terakhir diperiksa<strong id="position">-</strong></div><div class="stat">Hasil pencarian<strong id="result">Belum dimulai</strong></div></div>
+<h2 style="margin-top:20px">Riwayat pemeriksaan</h2><table><thead><tr><th>Pemeriksaan ke-</th><th>Data yang diperiksa</th><th>Hasil</th></tr></thead><tbody id="history"><tr><td colspan="3" class="small">Belum ada data yang diperiksa.</td></tr></tbody></table>
+<p class="small">Catat setiap baris riwayat pemeriksaan pada tabel LKM kelompok kalian. Isikan target dan jumlah pemeriksaan pada bagian yang tersedia di LKM.</p>
+</section>
+<section class="panel"><h2>Petunjuk singkat</h2><ol class="steps"><li>Mulai memeriksa dari elemen pertama.</li><li>Bandingkan data yang diperiksa dengan target.</li><li>Jika cocok, pencarian berhenti.</li><li>Jika tidak cocok, lanjutkan ke elemen berikutnya.</li><li>Jika semua elemen sudah diperiksa dan tidak cocok, data tidak ditemukan.</li></ol>
+<p class="small">Seluruh nama ruang kelas dan target pada website ini merupakan data simulasi, bukan jadwal pemeliharaan sekolah yang sebenarnya.</p></section>
+</main><footer>SEARCH LAB · Media simulasi pembelajaran</footer>
+<script>
+const dataSets=[{"list": ["X TKJ 1", "X RPL 1", "X DKV 1", "XI TKJ 1", "XI RPL 1", "XI DKV 1", "XII TKJ 1"], "targets": ["X DKV 1", "XII TKJ 1", "XII RPL 1"]}, {"list": ["XI RPL 1", "X TKJ 1", "XII TKJ 1", "X DKV 1", "XI DKV 1", "X RPL 1", "XI TKJ 1"], "targets": ["XI RPL 1", "XI TKJ 1", "XII RPL 1"]}, {"list": ["X RPL 1", "XI DKV 1", "X TKJ 1", "XII TKJ 1", "XI TKJ 1", "X DKV 1", "XI RPL 1"], "targets": ["XI TKJ 1", "XI RPL 1", "XII RPL 1"]}, {"list": ["XII TKJ 1", "XI TKJ 1", "X RPL 1", "XI RPL 1", "X DKV 1", "X TKJ 1", "XI DKV 1"], "targets": ["XI TKJ 1", "XI DKV 1", "XII RPL 1"]}, {"list": ["XI DKV 1", "XII TKJ 1", "X RPL 1", "X TKJ 1", "XI RPL 1", "X DKV 1", "XI TKJ 1"], "targets": ["X DKV 1", "XI TKJ 1", "XII RPL 1"]}, {"list": ["X DKV 1", "XI RPL 1", "XI TKJ 1", "XII TKJ 1", "X TKJ 1", "XI DKV 1", "X RPL 1"], "targets": ["XII TKJ 1", "X RPL 1", "XII RPL 1"]}, {"list": ["XI TKJ 1", "X DKV 1", "X RPL 1", "XI DKV 1", "X TKJ 1", "XII TKJ 1", "XI RPL 1"], "targets": ["XI TKJ 1", "XI RPL 1", "XII RPL 1"]}, {"list": ["XII TKJ 1", "X RPL 1", "XI DKV 1", "X TKJ 1", "XI TKJ 1", "X DKV 1", "XI RPL 1"], "targets": ["XI TKJ 1", "XI RPL 1", "XII RPL 1"]}, {"list": ["X TKJ 1", "XI DKV 1", "XI RPL 1", "XII TKJ 1", "X RPL 1", "XI TKJ 1", "X DKV 1"], "targets": ["XI DKV 1", "X DKV 1", "XII RPL 1"]}];
+let group=0,caseNo=0,pointer=0,finished=false,history=[];
+const el=id=>document.getElementById(id);
+dataSets.forEach((_,i)=>{const b=document.createElement("button");b.className="group-btn"+(i===0?" active":"");b.textContent="Kelompok "+(i+1);b.addEventListener("click",()=>{group=i;caseNo=0;document.querySelectorAll(".group-btn").forEach((x,j)=>x.classList.toggle("active",j===i));resetCase()});el("groupButtons").appendChild(b)});
+function draw(){const list=dataSets[group].list;el("dataGrid").innerHTML="";list.forEach((v,i)=>{const card=document.createElement("div");card.className="item";if(!finished&&i===pointer)card.classList.add("current");if(i<pointer)card.classList.add("checked");if(history.some(h=>h.index===i&&h.match))card.classList.add("found");const n=document.createElement("span");n.className="number";n.textContent="Elemen "+(i+1);const val=document.createElement("span");val.className="value";val.textContent=v;card.append(n,val);el("dataGrid").appendChild(card)})}
+function resetCase(){pointer=0;finished=false;history=[];el("groupName").textContent="KELOMPOK "+(group+1);el("caseName").textContent="Kasus "+(caseNo+1)+" dari 3";el("target").textContent=dataSets[group].targets[caseNo];el("count").textContent="0";el("position").textContent="-";el("result").textContent="Belum dimulai";el("status").className="status";el("status").textContent="Tekan “Periksa berikutnya” untuk memeriksa data pertama.";el("checkBtn").disabled=false;el("nextBtn").disabled=true;el("nextBtn").textContent=caseNo===2?"Kembali ke kasus 1":"Kasus berikutnya";el("history").innerHTML='<tr><td colspan="3" class="small">Belum ada data yang diperiksa.</td></tr>';draw()}
+function checkNext(){if(finished)return;const list=dataSets[group].list,target=dataSets[group].targets[caseNo],value=list[pointer],match=value===target;history.push({index:pointer,value,match});pointer++;const row=document.createElement("tr");[history.length,value,match?"Cocok":"Tidak cocok"].forEach(v=>{const c=document.createElement("td");c.textContent=v;row.appendChild(c)});if(history.length===1)el("history").innerHTML="";el("history").appendChild(row);el("count").textContent=history.length;el("position").textContent=pointer;
+if(match){finished=true;el("result").textContent="Ditemukan";el("status").className="status good";el("status").textContent="Target ditemukan pada elemen ke-"+pointer+". Pencarian dihentikan."}
+else if(pointer===list.length){finished=true;el("result").textContent="Tidak ditemukan";el("status").className="status bad";el("status").textContent="Semua elemen telah diperiksa. Target tidak ditemukan dalam daftar."}
+else{el("result").textContent="Sedang berlangsung";el("status").className="status";el("status").textContent="Data belum cocok. Lanjutkan dengan memeriksa elemen berikutnya."}
+if(finished){el("checkBtn").disabled=true;el("nextBtn").disabled=false}draw()}
+el("checkBtn").addEventListener("click",checkNext);el("retryBtn").addEventListener("click",resetCase);el("nextBtn").addEventListener("click",()=>{caseNo=(caseNo+1)%3;resetCase()});resetCase();
+</script></body></html>
